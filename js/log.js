@@ -36,27 +36,27 @@ var log = log || {};
     let overrideConsole = () => {
         console = {};
 
-        console.error = function () {
+        console.error = () => {
             if (logLevel.ERROR <= config.LOG_LEVEL) {
                 out('ERROR', arguments);
             }
         }
-        console.warn = function () {
+        console.warn = () => {
             if (logLevel.WARN <= config.LOG_LEVEL) {
                 out('WARN', arguments);
             }
         }
-        console.info = function () {
+        console.info = () => {
             if (logLevel.INFO <= config.LOG_LEVEL) {
                 out('INFO', arguments);
             }
         }
-        console.debug = function () {
+        console.debug = () => {
             if (logLevel.DEBUG <= config.LOG_LEVEL) {
                 out('DEBUG', arguments);
             }
         }
-        console.log = function () {
+        console.log = () => {
             if (logLevel.DEBUG <= config.LOG_LEVEL) {
                 out('DEBUG', arguments);
             }
