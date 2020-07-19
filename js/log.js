@@ -1,6 +1,4 @@
-
-var log = log || {};
-{
+var log = log || {}; {
     // ログレベル
     let logLevel = {
         ERROR: 0,
@@ -23,7 +21,9 @@ var log = log || {};
             if (0 < msgList.length) {
                 let msg = msgList.join('\r\n');
                 msgList = [];
-                postMsg({ msg: msg });
+                postMsg({
+                    msg: msg
+                });
             }
             setTimeout(run, 1000);
         }
@@ -35,30 +35,29 @@ var log = log || {};
      */
     let overrideConsole = () => {
         console = {};
-
-        console.error = () => {
+        console.error = (...args) => {
             if (logLevel.ERROR <= config.LOG_LEVEL) {
-                out('ERROR', arguments);
+                out('ERROR', args);
             }
         }
-        console.warn = () => {
+        console.warn = (...args) => {
             if (logLevel.WARN <= config.LOG_LEVEL) {
-                out('WARN', arguments);
+                out('WARN', args);
             }
         }
-        console.info = () => {
+        console.info = (...args) => {
             if (logLevel.INFO <= config.LOG_LEVEL) {
-                out('INFO', arguments);
+                out('INFO', args);
             }
         }
-        console.debug = () => {
+        console.debug = (...args) => {
             if (logLevel.DEBUG <= config.LOG_LEVEL) {
-                out('DEBUG', arguments);
+                out('DEBUG', args);
             }
         }
-        console.log = () => {
+        console.log = (...args) => {
             if (logLevel.DEBUG <= config.LOG_LEVEL) {
-                out('DEBUG', arguments);
+                out('DEBUG', args);
             }
         }
         console.ws = null;
@@ -96,41 +95,7 @@ var log = log || {};
     let convertMsg = (arg) => {
         let msg = '';
         for (let i = 0; i < arg.length; i++) {
-            let t = typeof arg[i];
-            switch (t) {
-                case 'number':
-                case 'boolean':
-                case 'string':
-                    t = arg[i];
-                    break;
-                case 'object':
-                    if (isArray(arg[i])) {
-                        t = '[';
-                        let count = 0;
-                        for (let p in arg[i]) {
-                            t += dumpObject(arg[i][p]);
-                            count++;
-                            if (count < arg[i].length) {
-                                t += ',';
-                            }
-                        }
-                        t += ']';
-                    } else {
-                        t = '{';
-                        let count = 0;
-                        let objLen = Object.keys(arg[i]).length;
-                        for (let p in arg[i]) {
-                            t += p + ':' + dumpObject(arg[i][p]);
-                            count++;
-                            if (count < objLen) {
-                                t += ',';
-                            }
-                        }
-                        t += '}';
-                    }
-                    break;
-            }
-            msg += ' ' + t;
+            msg += ' ' + dumpObject(arg[i]);
         }
         return msg;
     }
@@ -140,43 +105,47 @@ var log = log || {};
      * @param {Object} obj 
      */
     let dumpObject = (obj) => {
+        let v = null;
         let t = typeof obj;
         switch (t) {
             case 'number':
             case 'boolean':
-                t = obj;
+                v = obj;
                 break;
             case 'string':
-                t = '"' + obj + '"';
+                v = '"' + obj + '"';
                 break;
             case 'object':
                 if (isArray(obj)) {
-                    t = '[';
+                    v = '[';
                     let count = 0;
-                    for (let p in obj) {
-                        t += dumpObject(obj[p]);
+                    for (let value of obj) {
+                        v += dumpObject(value);
                         count++;
                         if (count < obj.length) {
-                            t += ',';
+                            v += ',';
                         }
                     }
-                    t += ']';
+                    v += ']';
                 } else {
-                    t = '{';
+                    v = '{';
                     let count = 0;
-                    let objLen = Object.keys(obj).length;
-                    for (let p in obj) {
-                        t += p + ':' + dumpObject(obj[p]);
-                        count++;
-                        if (count < objLen) {
-                            t += ',';
+                    let nameList = Object.getOwnPropertyNames(obj);
+                    for (let key of nameList) {
+                        let ret = dumpObject(obj[key]);
+                        if (ret) {
+                            v += key + ':' + ret;
+                            count++;
+                            if (count < nameList.length) {
+                                v += ',';
+                            }
                         }
                     }
-                    t += '}';
+                    v += '}';
                 }
                 break;
         }
-        return t;
+        return v;
     }
 
     /**
@@ -200,17 +169,25 @@ var log = log || {};
                 if (req.responseText && req.status === 200) {
                     resolve(req.responseText);
                 } else {
-                    reject({ message: `API response invalid (http status:${req.status})` });
+                    reject({
+                        message: `API response invalid (http status:${req.status})`
+                    });
                 }
             };
             req.onerror = () => {
-                reject({ message: `API request error.` });
+                reject({
+                    message: `API request error.`
+                });
             };
             req.ontimeout = () => {
-                reject({ message: 'API request timeout.' });
+                reject({
+                    message: 'API request timeout.'
+                });
             };
             req.onabort = () => {
-                reject({ message: 'API request abort.' });
+                reject({
+                    message: 'API request abort.'
+                });
             };
             req.timeout = 60 * 1000;
             req.setRequestHeader('Content-Type', 'application/json');
