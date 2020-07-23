@@ -105,7 +105,7 @@ var log = log || {}; {
      * @param {Object} obj 
      */
     let dumpObject = (obj) => {
-        let v = null;
+        let v = '';
         let t = typeof obj;
         switch (t) {
             case 'number':
@@ -127,7 +127,7 @@ var log = log || {}; {
                         }
                     }
                     v += ']';
-                } else {
+                } else if (isObject(obj) || isError(obj)) {
                     v = '{';
                     let count = 0;
                     let nameList = Object.getOwnPropertyNames(obj);
@@ -142,18 +142,42 @@ var log = log || {}; {
                         }
                     }
                     v += '}';
+                } else if (isString(obj) || isDate(obj)) {
+                    v = '"' + obj.toString() + '"';
+                } else if (isNumber(obj) || isBoolean(obj)) {
+                    v = obj.valueOf();
                 }
                 break;
         }
         return v;
     }
 
-    /**
-     * 配列を判定する
-     * @param {Object} obj 
-     */
     let isArray = (obj) => {
         return Object.prototype.toString.call(obj) === '[object Array]';
+    }
+
+    let isBoolean = (obj) => {
+        return Object.prototype.toString.call(obj) === '[object Boolean]';
+    }
+
+    let isDate = (obj) => {
+        return Object.prototype.toString.call(obj) === '[object Date]';
+    }
+
+    let isError = (obj) => {
+        return Object.prototype.toString.call(obj) === '[object Error]';
+    }
+
+    let isNumber = (obj) => {
+        return Object.prototype.toString.call(obj) === '[object Number]';
+    }
+
+    let isObject = (obj) => {
+        return Object.prototype.toString.call(obj) === '[object Object]';
+    }
+
+    let isString = (obj) => {
+        return Object.prototype.toString.call(obj) === '[object String]';
     }
 
     /**
